@@ -1,5 +1,14 @@
 # Preparation
 
+## Export
+
+Out installation path is `/usr/local/gentoo` :
+
+```sh
+export EPREFIX=/usr/local/gentoo
+```
+
+
 ## Dockerfile
 
 ```dockerfile
@@ -35,21 +44,29 @@ CMD ["/usr/bin/bootstrap-prefix.sh"]
 ```
 
 ```sh
-docker build -t gentoo-builder .
+# Choose the correct installation path and user:group permissions
+docker build \
+	--build-arg UID=1611 \
+	--build-arg USER=marc \
+	--build-arg GID=1600 \
+	--build-arg GROUP=cluster-users \
+	--build-arg EPREFIX=$EPREFIX \
+	-t gentoo-builder .
 ```
 
 ## Mkdir + chown output
 
 ```sh
-mkdir gentoo
-sudo chown 2001:2001 ./gentoo
+mkdir -p $EPREFIX
+sudo chown 1611:1600 $EPREFIX
 ```
 
-## Lancer le script
+## Run script
 
 ```sh
+# The volume binding names must match
 docker run -it --rm --name gentoo-builder \
-	-v $(pwd)/gentoo:/gentoo \
+	-v $EPREFIX:$EPREFIX \
 	gentoo-builder
 ```
 
@@ -57,15 +74,15 @@ docker run -it --rm --name gentoo-builder \
 Do you want me to start off now? [Yn]
 How many parallel make jobs do you want? [8] 48
 Do you want to use stable Prefix? [Yn] n
-What do you want EPREFIX to be? [/gentoo]
+What do you want EPREFIX to be? [/usr/local/gentoo]
 Type here what you want to wish me [luck]
 ```
 
-## Fixer la dépendance circulaire et le pwd
+## Fix the circulardependency and pwd
 
-### Ignorer la dépendance en runtime `sys-libs/libxcrypt`
+### Ignore the runtime dependency `sys-libs/libxcrypt`
 
-Le script va crasher à la première dépendance circulaire.
+The script will crash at the first circular dependency.
 
 ```txt
  * Error: circular dependencies:
@@ -79,39 +96,43 @@ Le script va crasher à la première dépendance circulaire.
  * disabling USE flags that trigger optional dependencies.
 ```
 
-Nous allons fixer cette dépendance circulaire en plus de la non-détection de `libperl.so`.
+We will fix this circular dependency in addition to the non-detection of `libperl.so`.
 
 ```sh
-mkdir -p ./gentoo/tmp/etc/portage/profile/
-echo "sys-libs/libxcrypt-4.4.26" >> ./gentoo/tmp/etc/portage/profile/package.provided
+mkdir -p $EPREFIX/tmp/etc/portage/profile/
+echo "sys-libs/libxcrypt-4.4.26" >> $EPREFIX/tmp/etc/portage/profile/package.provided
 ```
 
-Cela permet d'ignorer la dépendance `sys-libs/libxcrypt-4.4.26` qui est une dépendance en runtime.
+This allows to ignore the `sys-libs/libxcrypt-4.4.26` dependency which is a runtime dependency.
 
-### Détecter libperl.so
+### Detect libperl.so
 
-Modifiez `./gentoo/etc/portage/make.conf` et ajoutez :
+Edit `$EPREFIX/etc/portage/make.conf` and add :
 
 ```sh
-LD_LIBRARY_PATH="/gentoo/usr/lib64:/gentoo/usr/lib:/gentoo/tmp/lib64:/gentoo/tmp/lib:/gentoo/tmp/usr/lib64:/gentoo/tmp/usr/lib"
+LD_LIBRARY_PATH="/usr/local/gentoo/usr/lib64:/usr/local/gentoo/usr/lib:/usr/local/gentoo/tmp/lib64:/usr/local/gentoo/tmp/lib:/usr/local/gentoo/tmp/usr/lib64:/usr/local/gentoo/tmp/usr/lib"
 ```
 
-### Mettre pwd
+Replace `/usr/local/gentoo` with the value of `$EPREFIX`.
 
-Faites `cp /bin/pwd ./gentoo/tmp/bin/pwd `
+### Put pwd
 
-### Relancer
+```sh
+cp /bin/pwd $EPREFIX/tmp/bin/pwd
+```
 
-Relancer :
+### Run again
+
+Run again :
 
 ```sh
 docker run -it --rm --name gentoo-builder \
-	-v $(pwd)/gentoo:/gentoo \
+	-v $EPREFIX:$EPREFIX \
 	gentoo-builder
 ```
 
-Si cela crash à un moment, retirez `$EPREFIX/tmp/etc/portage/profile/package.provided`.
+If it crashes at some point, remove `$EPREFIX/tmp/etc/portage/profile/package.provided`.
 
-Relancer le script avec les même paramètres. 
+Restart the script with the same parameters. 
 
 
