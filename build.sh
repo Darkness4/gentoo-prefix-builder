@@ -1,5 +1,5 @@
 #!/bin/sh
-docker build \
+docker buildx build \
 	--build-arg UID=1611 \
 	--build-arg USER=marc \
 	--build-arg GID=1600 \
