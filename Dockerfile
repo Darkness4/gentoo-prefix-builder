@@ -15,7 +15,8 @@ ARG group
 # Check ubuntu glibc version : https://pkgs.org/search/?q=glibc
 # Check gentoo glibc version : https://packages.gentoo.org/packages/sys-libs/glibc
 # They must match. This is pretty much why we are using fedora.
-RUN dnf install -y @development-tools \
+RUN dnf install -y make \
+  gcc \
   gcc-c++ \
   sudo \
   wget \
