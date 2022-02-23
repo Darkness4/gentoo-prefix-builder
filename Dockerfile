@@ -15,11 +15,12 @@ ARG group
 # Check ubuntu glibc version : https://pkgs.org/search/?q=glibc
 # Check gentoo glibc version : https://packages.gentoo.org/packages/sys-libs/glibc
 # They must match. This is pretty much why we are using fedora.
-RUN dnf install -y make \
+RUN dnf install -y @development-tools \
   gcc \
   gcc-c++ \
   sudo \
   wget \
+  perl-core \
   && dnf clean all
 
 RUN groupadd -g ${gid} ${group} && useradd -u ${uid} -g ${group} ${user}
