@@ -4,7 +4,7 @@ ARG gid=2001
 ARG group=gentoo-group
 ARG eprefix=/gentoo
 
-FROM fedora:34
+FROM quay.io/fedora/fedora:34
 
 ARG uid
 ARG gid
