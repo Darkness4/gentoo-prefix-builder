@@ -1,24 +1,28 @@
-ARG UID=2001
-ARG USER=gentoo-user
-ARG GID=2001
-ARG GROUP=gentoo-group
-ARG EPREFIX=/gentoo
+ARG uid=2001
+ARG user=gentoo-user
+ARG gid=2001
+ARG group=gentoo-group
+ARG eprefix=/gentoo
 
-FROM ubuntu:21.10
+FROM fedora:34
 
-ARG UID
-ARG GID
-ARG EPREFIX
-ARG USER
-ARG GROUP
+ARG uid
+ARG gid
+ARG eprefix
+ARG user
+ARG group
 
-# Check ubuntu glibc version : https://launchpad.net/ubuntu/+source/glibc
+# Check ubuntu glibc version : https://pkgs.org/search/?q=glibc
 # Check gentoo glibc version : https://packages.gentoo.org/packages/sys-libs/glibc
-# They must match
-RUN apt update -y && apt install -y build-essential wget && rm -rf /var/lib/apt/lists/*
+# They must match. This is pretty much why we are using fedora.
+RUN dnf install -y @development-tools \
+  gcc-c++ \
+  sudo \
+  wget \
+  && dnf clean all
 
-RUN groupadd -g ${GID} ${GROUP} && useradd -u ${UID} -g ${GROUP} ${USER}
-RUN mkdir -p ${EPREFIX} && chmod 775 ${EPREFIX} && chown ${UID}:${GID} ${EPREFIX}
+RUN groupadd -g ${gid} ${group} && useradd -u ${uid} -g ${group} ${user}
+RUN mkdir -p ${eprefix} && chmod 775 ${eprefix} && chown ${uid}:${gid} ${eprefix}
 
 RUN wget https://gitweb.gentoo.org/repo/proj/prefix.git/plain/scripts/bootstrap-bash.sh -qO /tmp/bootstrap-bash.sh \
   && chmod +x /tmp/bootstrap-bash.sh \
@@ -32,9 +36,9 @@ RUN wget https://gitweb.gentoo.org/repo/proj/prefix.git/plain/scripts/bootstrap-
   && sed -i 's/m4 1.4.18/m4 1.4.19/g' /usr/bin/bootstrap-prefix.sh \
   && sed -i 's/\[\[ \${PN} == "m4" \]\]/false/g' /usr/bin/bootstrap-prefix.sh
 
-WORKDIR ${EPREFIX}
-USER ${USER}:${GROUP}
-ENV EPREFIX=${EPREFIX}
+WORKDIR ${eprefix}
+USER ${user}:${group}
+ENV EPREFIX=${eprefix}
 ENV PATH="/var/tmp/bash/usr/bin:${PATH}"
 
 CMD ["/usr/bin/bootstrap-prefix.sh"]
