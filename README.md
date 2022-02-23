@@ -8,49 +8,14 @@ Out installation path is `/usr/local/gentoo` :
 export EPREFIX=/usr/local/gentoo
 ```
 
-
-## Dockerfile
-
-```dockerfile
-ARG UID=2001
-ARG USER=gentoo-user
-ARG GID=2001
-ARG GROUP=gentoo-group
-ARG EPREFIX=/gentoo
-
-FROM ubuntu:21.04
-
-ARG UID
-ARG GID
-ARG EPREFIX
-ARG USER
-ARG GROUP
-
-# Check ubuntu glibc version : https://launchpad.net/ubuntu/+source/glibc
-# Check gentoo glibc version : https://packages.gentoo.org/packages/sys-libs/glibc
-# They must match
-RUN apt update -y && apt install -y build-essential wget && rm -rf /var/lib/apt/lists/*
-
-RUN groupadd -g ${GID} ${GROUP} && useradd -u ${UID} -g ${GROUP} ${USER}
-RUN mkdir -p ${EPREFIX} && chmod 775 ${EPREFIX} && chown ${UID}:${GID} ${EPREFIX}
-
-RUN wget https://gitweb.gentoo.org/repo/proj/prefix.git/plain/scripts/bootstrap-prefix.sh -qO /usr/bin/bootstrap-prefix.sh && chmod +x /usr/bin/bootstrap-prefix.sh
-
-WORKDIR ${EPREFIX}
-USER ${USER}:${GROUP}
-ENV EPREFIX=${EPREFIX}
-
-CMD ["/usr/bin/bootstrap-prefix.sh"]
-```
-
 ```sh
 # Choose the correct installation path and user:group permissions
 docker build \
-	--build-arg UID=1611 \
-	--build-arg USER=marc \
-	--build-arg GID=1600 \
-	--build-arg GROUP=cluster-users \
-	--build-arg EPREFIX=$EPREFIX \
+	--build-arg uid=1611 \
+	--build-arg user=marc \
+	--build-arg gid=1600 \
+	--build-arg group=cluster-users \
+	--build-arg eprefix=$EPREFIX \
 	-t gentoo-builder .
 ```
 
@@ -73,7 +38,7 @@ docker run -it --rm --name gentoo-builder \
 ```txt
 Do you want me to start off now? [Yn]
 How many parallel make jobs do you want? [8] 48
-Do you want to use stable Prefix? [Yn] n
+Do you want to use stable Prefix? [Yn]
 What do you want EPREFIX to be? [/usr/local/gentoo]
 Type here what you want to wish me [luck]
 ```
@@ -133,6 +98,4 @@ docker run -it --rm --name gentoo-builder \
 
 If it crashes at some point, remove `$EPREFIX/tmp/etc/portage/profile/package.provided`.
 
-Restart the script with the same parameters. 
-
-
+Restart the script with the same parameters.
