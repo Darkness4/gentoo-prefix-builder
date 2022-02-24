@@ -45,6 +45,8 @@ USER ${user}:${group}
 ENV EPREFIX=${eprefix}
 ENV GENTOO_MIRRORS=https://mirror.init7.net/gentoo/
 ENV REPOS_MIRRORS=rsync://rsync.fr.gentoo.org/gentoo-portage/
+ENV STABLE_PREFIX=yes
+ENV MAKEOPTS=-j8
 ENV PATH="/var/tmp/bash/usr/bin:${PATH}"
 
 CMD ["/usr/bin/bootstrap-prefix.sh"]

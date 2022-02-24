@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -e "${EPREFIX}/.stage1-finished" ]; then
-  STOP_BOOTSTRAP_AFTER=stage1 LATEST_TREE_YES=1 STABLE_PREFIX=yes /usr/bin/bootstrap-prefix.sh noninteractive
+  STOP_BOOTSTRAP_AFTER=stage1 LATEST_TREE_YES=1 STABLE_PREFIX="${STABLE_PREFIX}" MAKEOPTS="${MAKEOPTS}" /usr/bin/bootstrap-prefix.sh "${EPREFIX}" noninteractive
 
   cat <<EOF >>"${EPREFIX}/etc/portage/repos.conf"
 [gentoo]
@@ -24,4 +24,4 @@ GENTOO_MIRRORS="${GENTOO_MIRRORS}"
 EOF
 fi
 
-LATEST_TREE_YES=1 STABLE_PREFIX=yes /usr/bin/bootstrap-prefix.sh noninteractive
+LATEST_TREE_YES=1 STABLE_PREFIX="${STABLE_PREFIX}" MAKEOPTS="${MAKEOPTS}" /usr/bin/bootstrap-prefix.sh "${EPREFIX}" noninteractive

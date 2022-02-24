@@ -9,4 +9,6 @@ docker run -it --rm --name gentoo-builder \
 	-e PORTAGE_TMPDIR=/tmp/gentoo \
 	-e GENTOO_MIRRORS=https://mirror.init7.net/gentoo/ \
 	-e REPOS_MIRRORS=rsync://rsync.fr.gentoo.org/gentoo-portage/ \
+	-e STABLE_PREFIX=yes \
+	-e MAKEOPTS=-j32 \
 	gentoo-builder
