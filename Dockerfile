@@ -43,6 +43,8 @@ RUN wget https://gitweb.gentoo.org/repo/proj/prefix.git/plain/scripts/bootstrap-
 WORKDIR ${eprefix}
 USER ${user}:${group}
 ENV EPREFIX=${eprefix}
+ENV GENTOO_MIRRORS=https://mirror.init7.net/gentoo/
+ENV REPOS_MIRRORS=rsync://rsync.fr.gentoo.org/gentoo-portage/
 ENV PATH="/var/tmp/bash/usr/bin:${PATH}"
 
 CMD ["/usr/bin/bootstrap-prefix.sh"]
