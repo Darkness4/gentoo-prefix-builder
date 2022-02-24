@@ -21,6 +21,8 @@ RUN dnf install -y @development-tools \
   sudo \
   wget \
   perl-core \
+  rsync \
+  zstd \
   && dnf clean all
 
 RUN groupadd -g ${gid} ${group} && useradd -u ${uid} -g ${group} ${user}
