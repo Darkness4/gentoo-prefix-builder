@@ -40,6 +40,9 @@ RUN wget https://gitweb.gentoo.org/repo/proj/prefix.git/plain/scripts/bootstrap-
   && sed -i 's/m4 1.4.18/m4 1.4.19/g' /usr/bin/bootstrap-prefix.sh \
   && sed -i 's/\[\[ \${PN} == "m4" \]\]/false/g' /usr/bin/bootstrap-prefix.sh
 
+COPY ./entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+
 WORKDIR ${eprefix}
 USER ${user}:${group}
 ENV EPREFIX=${eprefix}
@@ -49,4 +52,4 @@ ENV STABLE_PREFIX=yes
 ENV MAKEOPTS=-j8
 ENV PATH="/var/tmp/bash/usr/bin:${PATH}"
 
-CMD ["/usr/bin/bootstrap-prefix.sh"]
+CMD ["/usr/bin/entrypoint.sh"]
